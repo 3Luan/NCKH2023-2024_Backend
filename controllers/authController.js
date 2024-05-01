@@ -428,7 +428,13 @@ let login = async (req, res) => {
 let logout = async (req, res) => {
   try {
     // xóa cookie
-    res.clearCookie("token");
+    // res.clearCookie("token");
+    res.cookie("token", "", {
+      httpOnly: true,
+      maxAge: -1, // hoặc sử dụng expires: new Date(0)
+      sameSite: "none",
+      secure: true,
+    });
 
     res.status(200).json({
       code: 0,

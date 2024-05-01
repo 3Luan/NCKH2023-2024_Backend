@@ -47,7 +47,7 @@ const server = app.listen(PORT, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://utc2-social.vercel.app",
+    origin: "https://utc2social.vercel.app",
     // // credentials: true,
 
     // origin: { URL_FRONTEND }, // Chỉ định miền nguồn cho phép
