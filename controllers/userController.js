@@ -5,6 +5,7 @@ const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const imageUploadPath = path.join("uploads/images");
 const adminModel = require("../models/adminModel");
+const NotificationModel = require("../models/notificationModel");
 
 //@description     Get or Search all users
 //@route           GET /api/user?search=
@@ -66,6 +67,15 @@ let followUser = async (req, res) => {
         message: "Người dùng này đã tồn tại trong danh sách theo dõi",
       };
     }
+
+    // Gửi thông báo cho người được theo dõi
+    const notification = new NotificationModel({
+      sender: userIdOne, // Không cần thông tin người gửi, có thể để null
+      receiver: userIdTwo,
+      message: "đã theo dõi bạn bạn",
+      link: `/profile/${userIdOne}`, // Đường dẫn đến bài viết
+    });
+    await notification.save();
 
     res.status(200).json({
       code: 0,
@@ -528,8 +538,6 @@ let updateProfile = async (req, res) => {
         message: "Lỗi: Thông tin không đủ",
       };
     }
-
-    console.log(birth);
 
     const user = await User.findById(userId);
 
@@ -1096,9 +1104,6 @@ let searchAdminRole = async (req, res) => {
     const adminId = req.adminId;
 
     const admin = await adminModel.findById(adminId);
-
-    console.log("keyword", keyword);
-    console.log("currentPage", currentPage);
 
     if (!admin) {
       throw {

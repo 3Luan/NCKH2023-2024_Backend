@@ -15,4 +15,16 @@ router.post(
   notificationController.readNotification
 );
 
+router.post(
+  "/readAllNotification",
+  checkJWT,
+  notificationController.readAllNotification
+);
+
+router.get(
+  "/getUnreadNotification",
+  checkJWT,
+  notificationController.getUnreadNotification
+);
+
 module.exports = router;

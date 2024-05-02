@@ -114,8 +114,6 @@ let readNotification = async (req, res) => {
     const notificationId = req.body.notificationId;
     const userId = req.userId;
 
-    console.log("notificationId", notificationId);
-
     let user = await User.findById(userId);
 
     let notification = await NotificationModel.findById(notificationId);
@@ -166,46 +164,78 @@ let readNotification = async (req, res) => {
   }
 };
 
-// let readAllNotification = async (req, res) => {
-//   try {
-//     const userId = req.userId;
+let readAllNotification = async (req, res) => {
+  try {
+    const userId = req.userId;
 
-//     let user = await User.findById(userId);
+    let user = await User.findById(userId);
 
-//     if (!user) {
-//       throw {
-//         code: 1,
-//         message: "Lỗi: Không tìm thấy user",
-//       };
-//     }
+    if (!user) {
+      throw {
+        code: 1,
+        message: "Lỗi: Không tìm thấy user",
+      };
+    }
 
-//     if (!notification) {
-//       throw {
-//         code: 1,
-//         message: "Lỗi: Không tìm thấy thông báo",
-//       };
-//     }
+    // Đánh dấu tất cả các thông báo chưa đọc thành đã đọc
+    await NotificationModel.updateMany(
+      { receiver: userId, isRead: false },
+      { isRead: true }
+    );
 
-//     const updateData = {
-//       isRead: true,
-//     };
+    res.status(200).json({
+      code: 0,
+      message: "Đọc tất cả thông báo thành công",
+    });
+  } catch (error) {
+    res.status(200).json({
+      code: error.code || 1,
+      message: error.message || "Lỗi: readAllNotification",
+    });
+  }
+};
 
-//     await NotificationModel.updateOne({ _id: notificationId }, updateData);
+let getUnreadNotification = async (req, res) => {
+  try {
+    const userId = req.userId;
 
-//     res.status(200).json({
-//       code: 0,
-//       message: "Đọc tất cả thông báo thành công",
-//     });
-//   } catch (error) {
-//     res.status(200).json({
-//       code: error.code || 1,
-//       message: error.message || "Lỗi: readAllNotification",
-//     });
-//   }
-// };
+    let user = await User.findById(userId);
+
+    if (!user) {
+      throw {
+        code: 1,
+        message: "Lỗi: không tin thấy user",
+      };
+    }
+
+    if (user.isBan) {
+      throw {
+        code: 1,
+        message: "Lỗi: Tài khoản đã bị khóa",
+      };
+    }
+
+    const count = await NotificationModel.countDocuments({
+      receiver: userId,
+      isRead: false,
+    });
+
+    res.status(200).json({
+      code: 0,
+      message: "Lấy thông báo chưa đọc thành công",
+      count: count,
+    });
+  } catch (error) {
+    res.status(200).json({
+      code: error.code || 1,
+      message: error.message || "Lỗi: getUnreadNotification",
+    });
+  }
+};
 
 module.exports = {
   getNotifications,
   readNotification,
-  // readAllNotification,
+  readAllNotification,
+  getUnreadNotification,
 };

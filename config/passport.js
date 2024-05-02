@@ -11,8 +11,6 @@ passport.use(
       scope: ["email", "profile"],
     },
     function (accessToken, refreshToken, profile, cb) {
-      console.log(process.env.GOOGLE_CLIENT_ID);
-      console.log(process.env.GOOGLE_CLIENT_SECRET);
       return cb(profile);
     }
   )
