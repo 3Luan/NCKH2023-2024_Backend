@@ -39,6 +39,19 @@ const sendMessage = async (req, res) => {
   const images = req.files.images || [];
   const files = req.files.files || [];
 
+  // Kiểm tra xem người dùng hiện tại có trong cuộc trò chuyện không
+  const chat = await Chat.findById(chatId).populate("users", "_id");
+  const isUserInChat = chat.users.some(
+    (user) => user._id.toString() === req.userId
+  );
+
+  if (!isUserInChat) {
+    return res.status(200).json({
+      code: 1,
+      message: "Bạn không tồn tại trong cuộc trò chuyện này",
+    });
+  }
+
   if (!content || !chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
